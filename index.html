@@ -8,11 +8,10 @@
 body {
     margin: 0;
     font-family: Arial;
-    text-align: center;
     color: white;
 }
 
-/* TELA INICIAL */
+/* INICIO */
 #inicio {
     height: 100vh;
     background: url("img/fundo-login.jpg") no-repeat center/cover;
@@ -20,20 +19,22 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    position: relative;
 }
 
-/* TELA DO JOGO */
+/* JOGO */
 #jogo {
     display: none;
-    min-height: 100vh;
+    height: 100vh;
     background: url("img/fundo-jogo.jpg") no-repeat center/cover;
-    position: relative;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 /* ESCURECER FUNDO */
-#inicio::before,
-#jogo::before {
+#inicio::before, #jogo::before {
     content: "";
     position: absolute;
     width: 100%;
@@ -43,7 +44,6 @@ body {
     left: 0;
 }
 
-/* GARANTE QUE O CONTEÚDO FIQUE NA FRENTE */
 #inicio *, #jogo * {
     position: relative;
     z-index: 1;
@@ -59,7 +59,7 @@ button {
     border: none;
 }
 
-/* CRONÔMETRO */
+/* TEMPO */
 #tempo {
     position: absolute;
     top: 10px;
@@ -70,12 +70,12 @@ button {
     border-radius: 8px;
 }
 
-/* TABULEIRO */
+/* TABULEIRO CENTRALIZADO */
 #tabuleiro {
     display: grid;
     justify-content: center;
+    align-content: center;
     gap: 10px;
-    margin-top: 80px;
 }
 
 /* CARTAS */
@@ -96,12 +96,12 @@ button {
     object-fit: cover;
 }
 
-/* TELA FINAL */
+/* FIM */
 #fim {
     display: none;
     height: 100vh;
     background: linear-gradient(45deg, #141e30, #243b55);
-    display: none;
+    display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -111,7 +111,6 @@ button {
 
 <body>
 
-<!-- INICIO -->
 <div id="inicio">
     <h1>Jogo da Memória</h1>
     <button onclick="iniciar(1)">Fácil</button>
@@ -119,14 +118,12 @@ button {
     <button onclick="iniciar(3)">Difícil</button>
 </div>
 
-<!-- JOGO -->
 <div id="jogo">
     <h2 id="info">Pontos: 0</h2>
     <div id="tempo"></div>
     <div id="tabuleiro"></div>
 </div>
 
-<!-- FIM -->
 <div id="fim">
     <h1>Fim de Jogo</h1>
     <h2 id="resultado"></h2>
@@ -159,7 +156,7 @@ let intervalo;
 
 function iniciar(nivel) {
     document.getElementById("inicio").style.display = "none";
-    document.getElementById("jogo").style.display = "block";
+    document.getElementById("jogo").style.display = "flex";
 
     pontos = 0;
     paresEncontrados = 0;
@@ -196,6 +193,8 @@ function criarTabuleiro(pares) {
 
     let selecionados = imagens.slice(0, pares);
     cartas = [...selecionados, ...selecionados];
+
+    // 🔥 EMBARALHAMENTO
     cartas.sort(() => Math.random() - 0.5);
 
     tabuleiro.style.gridTemplateColumns =
