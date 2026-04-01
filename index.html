@@ -15,15 +15,38 @@ body {
 /* TELA INICIAL */
 #inicio {
     height: 100vh;
-    background: linear-gradient(45deg, #1e3c72, #2a5298);
+    background: url("img/fundo-login.jpg") no-repeat center/cover;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    position: relative;
 }
 
-#inicio button {
-    width: 200px;
+/* TELA DO JOGO */
+#jogo {
+    display: none;
+    min-height: 100vh;
+    background: url("img/fundo-jogo.jpg") no-repeat center/cover;
+    position: relative;
+}
+
+/* ESCURECER FUNDO */
+#inicio::before,
+#jogo::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    top: 0;
+    left: 0;
+}
+
+/* GARANTE QUE O CONTEÚDO FIQUE NA FRENTE */
+#inicio *, #jogo * {
+    position: relative;
+    z-index: 1;
 }
 
 /* BOTÕES */
@@ -36,20 +59,13 @@ button {
     border: none;
 }
 
-/* TELA DO JOGO */
-#jogo {
-    display: none;
-    min-height: 100vh;
-    background: linear-gradient(45deg, #000000, #434343);
-}
-
 /* CRONÔMETRO */
 #tempo {
     position: absolute;
     top: 10px;
     right: 20px;
     font-size: 20px;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0,0,0,0.7);
     padding: 10px;
     border-radius: 8px;
 }
@@ -85,6 +101,7 @@ button {
     display: none;
     height: 100vh;
     background: linear-gradient(45deg, #141e30, #243b55);
+    display: none;
     flex-direction: column;
     justify-content: center;
     align-items: center;
