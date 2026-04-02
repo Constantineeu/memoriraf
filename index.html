@@ -1,957 +1,904 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Jogo da Memória</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jogo da Memória</title>
 
-<style>
-:root{
-    --azul-1:#0f172a;
-    --azul-2:#1e293b;
-    --azul-3:#334155;
-    --ciano:#22d3ee;
-    --roxo:#8b5cf6;
-    --verde:#22c55e;
-    --vermelho:#ef4444;
-    --branco:#ffffff;
-    --glass:rgba(255,255,255,0.10);
-    --glass-borda:rgba(255,255,255,0.18);
-    --sombra:0 20px 50px rgba(0,0,0,0.35);
-}
+  <style>
+    :root{
+      --bg1:#0f172a;
+      --bg2:#1e293b;
+      --bg3:#334155;
+      --azul:#2563eb;
+      --roxo:#7c3aed;
+      --verde:#22c55e;
+      --amarelo:#f59e0b;
+      --vermelho:#ef4444;
+      --branco:#ffffff;
+      --glass:rgba(255,255,255,0.10);
+      --glass-border:rgba(255,255,255,0.18);
+      --shadow:0 20px 40px rgba(0,0,0,0.35);
+    }
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
 
-body{
-    font-family: Arial, Helvetica, sans-serif;
-    color: var(--branco);
-    background:#020617;
-    overflow-x:hidden;
-}
+    body{
+      font-family: Arial, Helvetica, sans-serif;
+      color: white;
+      background: #020617;
+      overflow-x:hidden;
+    }
 
-/* TELAS */
-.tela{
-    min-height:100vh;
-    display:none;
-    position:relative;
-    overflow:hidden;
-    padding:30px 20px;
-}
+    .tela{
+      min-height:100vh;
+      display:none;
+      position:relative;
+      padding:24px;
+    }
 
-.tela.ativa{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
+    .tela.ativa{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+    }
 
-#inicio{
-    background:
-        linear-gradient(rgba(2,6,23,0.72), rgba(15,23,42,0.85)),
+    #inicio{
+      background:
+        linear-gradient(rgba(2,6,23,.72), rgba(15,23,42,.85)),
         url("img/fundo-login.jpg") center/cover no-repeat;
-}
+    }
 
-#jogo{
-    background:
-        linear-gradient(rgba(2,6,23,0.72), rgba(15,23,42,0.88)),
+    #jogo{
+      background:
+        linear-gradient(rgba(2,6,23,.72), rgba(15,23,42,.85)),
         url("img/fundo-jogo.jpg") center/cover no-repeat;
-    flex-direction:column;
-    gap:25px;
-}
+      flex-direction:column;
+      gap:20px;
+      align-items:center;
+    }
 
-#fim{
-    background:
-        radial-gradient(circle at top, rgba(34,211,238,0.18), transparent 35%),
+    #fim{
+      background:
+        radial-gradient(circle at top, rgba(37,99,235,.22), transparent 35%),
         linear-gradient(135deg, #0f172a, #1e1b4b, #111827);
-    flex-direction:column;
-    gap:25px;
-}
+      flex-direction:column;
+      gap:20px;
+      align-items:center;
+    }
 
-/* PAINÉIS */
-.painel{
-    background:var(--glass);
-    border:1px solid var(--glass-borda);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border-radius:24px;
-    box-shadow:var(--sombra);
-}
+    .painel{
+      background:var(--glass);
+      border:1px solid var(--glass-border);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+    }
 
-.inicio-wrap{
-    width:min(1200px, 100%);
-    display:grid;
-    grid-template-columns: 1.1fr 0.9fr;
-    gap:24px;
-    align-items:stretch;
-}
-
-.menu-box{
-    padding:40px 35px;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    gap:18px;
-}
-
-.menu-box h1{
-    font-size:clamp(2rem, 4vw, 3.6rem);
-    line-height:1.05;
-    text-shadow:0 8px 30px rgba(0,0,0,0.35);
-}
-
-.menu-box p{
-    color:rgba(255,255,255,0.85);
-    font-size:1.05rem;
-    line-height:1.5;
-}
-
-.input-nome{
-    width:100%;
-    max-width:420px;
-    padding:15px 18px;
-    border-radius:14px;
-    border:1px solid rgba(255,255,255,0.20);
-    outline:none;
-    background:rgba(255,255,255,0.10);
-    color:white;
-    font-size:16px;
-}
-
-.input-nome::placeholder{
-    color:rgba(255,255,255,0.65);
-}
-
-.botoes-nivel{
-    display:flex;
-    flex-wrap:wrap;
-    gap:12px;
-    margin-top:6px;
-}
-
-button{
-    border:none;
-    border-radius:14px;
-    padding:14px 22px;
-    font-size:16px;
-    font-weight:700;
-    cursor:pointer;
-    color:white;
-    transition:0.25s ease;
-    box-shadow:0 10px 24px rgba(0,0,0,0.25);
-}
-
-button:hover{
-    transform:translateY(-2px) scale(1.02);
-}
-
-button:active{
-    transform:translateY(0) scale(0.99);
-}
-
-.btn-facil{
-    background:linear-gradient(135deg, #22c55e, #16a34a);
-}
-
-.btn-medio{
-    background:linear-gradient(135deg, #f59e0b, #ea580c);
-}
-
-.btn-dificil{
-    background:linear-gradient(135deg, #8b5cf6, #6366f1);
-}
-
-.btn-secundario{
-    background:linear-gradient(135deg, #334155, #1e293b);
-}
-
-.btn-principal{
-    background:linear-gradient(135deg, #06b6d4, #2563eb);
-}
-
-.info-arquivos{
-    margin-top:8px;
-    font-size:14px;
-    color:rgba(255,255,255,0.75);
-    line-height:1.6;
-}
-
-/* RANKING */
-.ranking-box{
-    padding:24px;
-    display:flex;
-    flex-direction:column;
-    min-height:100%;
-}
-
-.ranking-box h2{
-    font-size:1.5rem;
-    margin-bottom:16px;
-}
-
-.ranking-scroll{
-    overflow:auto;
-    max-height:470px;
-    border-radius:18px;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-    background:rgba(255,255,255,0.96);
-    color:#0f172a;
-    overflow:hidden;
-    border-radius:18px;
-}
-
-th, td{
-    padding:12px 10px;
-    text-align:center;
-    border-bottom:1px solid rgba(15,23,42,0.08);
-    font-size:14px;
-}
-
-th{
-    background:linear-gradient(135deg, #2563eb, #7c3aed);
-    color:white;
-    position:sticky;
-    top:0;
-}
-
-tr:hover td{
-    background:rgba(59,130,246,0.06);
-}
-
-.sem-ranking{
-    padding:18px;
-    text-align:center;
-    color:#475569;
-    background:white;
-    border-radius:16px;
-}
-
-/* HUD DO JOGO */
-.topo-jogo{
-    width:min(1200px, 100%);
-    display:flex;
-    flex-direction:column;
-    gap:16px;
-}
-
-.topo-linha{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:14px;
-    flex-wrap:wrap;
-}
-
-.titulo-jogo{
-    font-size:clamp(1.3rem, 3vw, 2.1rem);
-    font-weight:700;
-}
-
-.hud{
-    display:grid;
-    grid-template-columns: repeat(4, minmax(160px, 1fr));
-    gap:14px;
-}
-
-.hud-card{
-    padding:16px;
-    border-radius:18px;
-    background:rgba(255,255,255,0.10);
-    border:1px solid rgba(255,255,255,0.12);
-    box-shadow:0 10px 20px rgba(0,0,0,0.18);
-}
-
-.hud-card small{
-    display:block;
-    color:rgba(255,255,255,0.70);
-    margin-bottom:6px;
-    font-size:12px;
-    text-transform:uppercase;
-    letter-spacing:1px;
-}
-
-.hud-card span{
-    font-size:1.3rem;
-    font-weight:800;
-}
-
-#tempo.critico{
-    color:#fecaca;
-    text-shadow:0 0 12px rgba(239,68,68,0.45);
-}
-
-.barra-wrap{
-    width:min(1200px, 100%);
-}
-
-.barra-fundo{
-    width:100%;
-    height:14px;
-    border-radius:999px;
-    background:rgba(255,255,255,0.15);
-    overflow:hidden;
-    box-shadow:inset 0 3px 10px rgba(0,0,0,0.25);
-}
-
-.barra{
-    height:100%;
-    width:0%;
-    background:linear-gradient(90deg, #22d3ee, #22c55e);
-    border-radius:999px;
-    transition:width 0.35s ease;
-    box-shadow:0 0 22px rgba(34,211,238,0.55);
-}
-
-/* TABULEIRO */
-#tabuleiro{
-    width:min(1200px, 100%);
-    display:grid;
-    gap:14px;
-    justify-content:center;
-    align-content:center;
-    padding:8px 4px 20px;
-}
-
-/* CARTAS */
-.carta{
-    width:110px;
-    height:145px;
-    perspective:1000px;
-    cursor:pointer;
-}
-
-.carta.encontrada{
-    cursor:default;
-}
-
-.carta-inner{
-    position:relative;
-    width:100%;
-    height:100%;
-    transform-style:preserve-3d;
-    transition:transform 0.7s ease;
-}
-
-.carta.virada .carta-inner,
-.carta.encontrada .carta-inner{
-    transform:rotateY(180deg);
-}
-
-.face{
-    position:absolute;
-    inset:0;
-    border-radius:18px;
-    overflow:hidden;
-    backface-visibility:hidden;
-    -webkit-backface-visibility:hidden;
-    box-shadow:0 12px 25px rgba(0,0,0,0.30);
-    border:2px solid rgba(255,255,255,0.12);
-}
-
-.verso{
-    background:linear-gradient(135deg, #0f172a, #1d4ed8, #7c3aed);
-}
-
-.frente{
-    transform:rotateY(180deg);
-    background:#0f172a;
-}
-
-.face img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
-}
-
-.carta:hover:not(.virada):not(.encontrada){
-    transform:translateY(-4px) scale(1.02);
-}
-
-.carta.encontrada .face{
-    box-shadow:0 0 0 2px rgba(34,197,94,0.55), 0 0 24px rgba(34,197,94,0.45);
-}
-
-/* FIM */
-.fim-box{
-    width:min(700px, 100%);
-    padding:34px 28px;
-    text-align:center;
-}
-
-.fim-box h1{
-    font-size:clamp(2rem, 5vw, 3.4rem);
-    margin-bottom:14px;
-}
-
-.fim-box p{
-    color:rgba(255,255,255,0.84);
-    margin-bottom:22px;
-}
-
-.resultado-grid{
-    display:grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap:14px;
-    margin-bottom:24px;
-}
-
-.resultado-item{
-    background:rgba(255,255,255,0.10);
-    border:1px solid rgba(255,255,255,0.12);
-    border-radius:18px;
-    padding:18px;
-}
-
-.resultado-item strong{
-    display:block;
-    font-size:12px;
-    text-transform:uppercase;
-    letter-spacing:1px;
-    color:rgba(255,255,255,0.65);
-    margin-bottom:8px;
-}
-
-.resultado-item span{
-    font-size:1.45rem;
-    font-weight:800;
-}
-
-.botoes-fim{
-    display:flex;
-    justify-content:center;
-    gap:12px;
-    flex-wrap:wrap;
-}
-
-.ranking-fim{
-    width:min(900px, 100%);
-    padding:24px;
-}
-
-/* RESPONSIVO */
-@media (max-width: 980px){
+    /* INÍCIO */
     .inicio-wrap{
-        grid-template-columns:1fr;
-    }
-
-    .hud{
-        grid-template-columns:repeat(2, 1fr);
-    }
-
-    .carta{
-        width:92px;
-        height:122px;
-    }
-}
-
-@media (max-width: 640px){
-    .hud{
-        grid-template-columns:1fr 1fr;
-    }
-
-    .resultado-grid{
-        grid-template-columns:1fr;
+      width:min(1150px, 100%);
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:24px;
+      align-items:stretch;
     }
 
     .menu-box{
-        padding:28px 20px;
+      padding:38px 30px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:18px;
     }
 
-    .ranking-box,
-    .ranking-fim{
-        padding:18px;
+    .menu-box h1{
+      font-size:clamp(2rem, 4vw, 3.4rem);
+      line-height:1.1;
     }
 
-    .carta{
-        width:78px;
-        height:104px;
+    .menu-box p{
+      font-size:1rem;
+      line-height:1.6;
+      color:rgba(255,255,255,.85);
     }
 
-    #tabuleiro{
-        gap:10px;
+    .input-nome{
+      width:100%;
+      max-width:420px;
+      padding:15px 16px;
+      border:none;
+      outline:none;
+      border-radius:14px;
+      font-size:16px;
+      color:white;
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.18);
+    }
+
+    .input-nome::placeholder{
+      color:rgba(255,255,255,.65);
+    }
+
+    .botoes-nivel{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:4px;
+    }
+
+    button{
+      border:none;
+      border-radius:14px;
+      padding:14px 20px;
+      font-size:16px;
+      font-weight:bold;
+      cursor:pointer;
+      color:white;
+      transition:.25s ease;
+      box-shadow:0 10px 24px rgba(0,0,0,.25);
+    }
+
+    button:hover{
+      transform:translateY(-2px) scale(1.02);
+    }
+
+    button:active{
+      transform:translateY(0) scale(.99);
+    }
+
+    .btn-facil{
+      background:linear-gradient(135deg, #22c55e, #16a34a);
+    }
+
+    .btn-medio{
+      background:linear-gradient(135deg, #f59e0b, #ea580c);
+    }
+
+    .btn-dificil{
+      background:linear-gradient(135deg, #8b5cf6, #6366f1);
+    }
+
+    .btn-secundario{
+      background:linear-gradient(135deg, #334155, #1e293b);
+    }
+
+    .btn-principal{
+      background:linear-gradient(135deg, #06b6d4, #2563eb);
+    }
+
+    .ranking-box{
+      padding:24px;
+      display:flex;
+      flex-direction:column;
+      min-height:100%;
+    }
+
+    .ranking-box h2{
+      margin-bottom:16px;
+      font-size:1.5rem;
+    }
+
+    .ranking-scroll{
+      overflow:auto;
+      max-height:470px;
+      border-radius:18px;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      background:rgba(255,255,255,.97);
+      color:#0f172a;
+      border-radius:18px;
+      overflow:hidden;
     }
 
     th, td{
+      padding:12px 10px;
+      text-align:center;
+      border-bottom:1px solid rgba(15,23,42,.08);
+      font-size:14px;
+    }
+
+    th{
+      background:linear-gradient(135deg, #2563eb, #7c3aed);
+      color:white;
+      position:sticky;
+      top:0;
+    }
+
+    tr:hover td{
+      background:rgba(59,130,246,.05);
+    }
+
+    .sem-ranking{
+      background:white;
+      color:#475569;
+      padding:18px;
+      text-align:center;
+    }
+
+    /* JOGO */
+    .topo-jogo{
+      width:min(1200px, 100%);
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+    }
+
+    .topo-linha{
+      width:100%;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .titulo-jogo{
+      font-size:clamp(1.5rem, 3vw, 2.3rem);
+      font-weight:800;
+    }
+
+    .hud{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(160px, 1fr));
+      gap:14px;
+    }
+
+    .hud-card{
+      padding:16px;
+      border-radius:18px;
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 10px 20px rgba(0,0,0,.18);
+    }
+
+    .hud-card small{
+      display:block;
+      color:rgba(255,255,255,.70);
+      margin-bottom:6px;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:1px;
+    }
+
+    .hud-card span{
+      font-size:1.28rem;
+      font-weight:800;
+    }
+
+    #tempo.critico{
+      color:#fecaca;
+      text-shadow:0 0 12px rgba(239,68,68,.45);
+    }
+
+    .barra-wrap{
+      width:min(1200px, 100%);
+    }
+
+    .barra-fundo{
+      width:100%;
+      height:14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.14);
+      overflow:hidden;
+      box-shadow:inset 0 3px 10px rgba(0,0,0,.22);
+    }
+
+    .barra{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg, #22d3ee, #22c55e);
+      border-radius:999px;
+      transition:width .35s ease;
+      box-shadow:0 0 18px rgba(34,211,238,.55);
+    }
+
+    #tabuleiro{
+      width:min(1200px, 100%);
+      display:grid;
+      justify-content:center;
+      gap:14px;
+      padding-bottom:20px;
+    }
+
+    /* CARTAS */
+    .carta{
+      width:110px;
+      height:145px;
+      perspective:1000px;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+
+    .carta:hover:not(.virada):not(.encontrada){
+      transform:translateY(-4px) scale(1.02);
+    }
+
+    .carta.encontrada{
+      cursor:default;
+    }
+
+    .carta-inner{
+      position:relative;
+      width:100%;
+      height:100%;
+      transform-style:preserve-3d;
+      transition:transform .7s ease;
+    }
+
+    .carta.virada .carta-inner,
+    .carta.encontrada .carta-inner{
+      transform:rotateY(180deg);
+    }
+
+    .face{
+      position:absolute;
+      inset:0;
+      backface-visibility:hidden;
+      -webkit-backface-visibility:hidden;
+      overflow:hidden;
+      border-radius:18px;
+      border:2px solid rgba(255,255,255,.12);
+      box-shadow:0 12px 25px rgba(0,0,0,.30);
+    }
+
+    .verso{
+      background:linear-gradient(135deg, #0f172a, #1d4ed8, #7c3aed);
+    }
+
+    .frente{
+      transform:rotateY(180deg);
+      background:#0f172a;
+    }
+
+    .face img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .carta.encontrada .face{
+      box-shadow:
+        0 0 0 2px rgba(34,197,94,.55),
+        0 0 22px rgba(34,197,94,.40);
+    }
+
+    /* FIM */
+    .fim-box{
+      width:min(700px, 100%);
+      padding:32px 26px;
+      text-align:center;
+    }
+
+    .fim-box h1{
+      font-size:clamp(2rem, 5vw, 3.3rem);
+      margin-bottom:12px;
+    }
+
+    .fim-box p{
+      color:rgba(255,255,255,.84);
+      margin-bottom:22px;
+    }
+
+    .resultado-grid{
+      display:grid;
+      grid-template-columns:repeat(2, 1fr);
+      gap:14px;
+      margin-bottom:24px;
+    }
+
+    .resultado-item{
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:18px;
+      padding:18px;
+    }
+
+    .resultado-item strong{
+      display:block;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      color:rgba(255,255,255,.65);
+      margin-bottom:8px;
+    }
+
+    .resultado-item span{
+      font-size:1.45rem;
+      font-weight:800;
+    }
+
+    .botoes-fim{
+      display:flex;
+      justify-content:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .ranking-fim{
+      width:min(900px, 100%);
+      padding:24px;
+    }
+
+    @media (max-width: 980px){
+      .inicio-wrap{
+        grid-template-columns:1fr;
+      }
+
+      .hud{
+        grid-template-columns:repeat(2, 1fr);
+      }
+
+      .carta{
+        width:92px;
+        height:122px;
+      }
+    }
+
+    @media (max-width: 640px){
+      .resultado-grid{
+        grid-template-columns:1fr;
+      }
+
+      .menu-box,
+      .ranking-box,
+      .ranking-fim{
+        padding:20px;
+      }
+
+      .carta{
+        width:78px;
+        height:104px;
+      }
+
+      #tabuleiro{
+        gap:10px;
+      }
+
+      th, td{
         font-size:12px;
         padding:10px 6px;
+      }
     }
-}
-</style>
+  </style>
 </head>
 <body>
 
-<!-- INÍCIO -->
-<section id="inicio" class="tela ativa">
+  <!-- INÍCIO -->
+  <section id="inicio" class="tela ativa">
     <div class="inicio-wrap">
-        <div class="painel menu-box">
-            <h1>Jogo da Memória</h1>
-            <p>
-                Escolha a dificuldade, encontre os pares antes do tempo acabar
-                e tente entrar no ranking com a melhor pontuação.
-            </p>
+      <div class="painel menu-box">
+        <h1>Jogo da Memória</h1>
+        <p>
+          Escolha a dificuldade e encontre os pares antes do tempo acabar.
+        </p>
 
-            <input
-                type="text"
-                id="nomeJogador"
-                class="input-nome"
-                placeholder="Digite seu nome"
-                maxlength="20"
-            />
+        <input
+          type="text"
+          id="nomeJogador"
+          class="input-nome"
+          placeholder="Digite seu nome"
+          maxlength="20"
+        />
 
-            <div class="botoes-nivel">
-                <button class="btn-facil" onclick="iniciar(1)">Fácil</button>
-                <button class="btn-medio" onclick="iniciar(2)">Médio</button>
-                <button class="btn-dificil" onclick="iniciar(3)">Difícil</button>
-            </div>
-
-            <div class="info-arquivos">
-                <div><strong>Níveis mantidos:</strong> Fácil = 3 pares | Médio = 7 pares | Difícil = 10 pares</div>
-                <div><strong>Verso único das cartas:</strong> arquivo <code>img/verso-carta.png</code></div>
-            </div>
+        <div class="botoes-nivel">
+          <button class="btn-facil" onclick="iniciar(1)">Fácil</button>
+          <button class="btn-medio" onclick="iniciar(2)">Médio</button>
+          <button class="btn-dificil" onclick="iniciar(3)">Difícil</button>
         </div>
+      </div>
 
-        <div class="painel ranking-box">
-            <h2>🏆 Ranking</h2>
-            <div class="ranking-scroll">
-                <table id="rankingInicio"></table>
-            </div>
+      <div class="painel ranking-box">
+        <h2>🏆 Ranking</h2>
+        <div class="ranking-scroll">
+          <table id="rankingInicio"></table>
         </div>
+      </div>
     </div>
-</section>
+  </section>
 
-<!-- JOGO -->
-<section id="jogo" class="tela">
+  <!-- JOGO -->
+  <section id="jogo" class="tela">
     <div class="topo-jogo">
-        <div class="topo-linha">
-            <div class="titulo-jogo" id="tituloJogador">Boa sorte!</div>
-            <button class="btn-secundario" onclick="voltarInicio()">Voltar ao início</button>
+      <div class="topo-linha">
+        <div class="titulo-jogo">Jogo da Memória</div>
+        <button class="btn-secundario" onclick="voltarInicio()">Voltar ao início</button>
+      </div>
+
+      <div class="hud">
+        <div class="hud-card">
+          <small>Jogador</small>
+          <span id="hudNome">-</span>
         </div>
 
-        <div class="hud">
-            <div class="hud-card">
-                <small>Jogador</small>
-                <span id="hudNome">-</span>
-            </div>
-            <div class="hud-card">
-                <small>Nível</small>
-                <span id="hudNivel">-</span>
-            </div>
-            <div class="hud-card">
-                <small>Pontos</small>
-                <span id="info">0</span>
-            </div>
-            <div class="hud-card">
-                <small>Tempo</small>
-                <span id="tempo">0s</span>
-            </div>
+        <div class="hud-card">
+          <small>Nível</small>
+          <span id="hudNivel">-</span>
         </div>
+
+        <div class="hud-card">
+          <small>Pontos</small>
+          <span id="info">0</span>
+        </div>
+
+        <div class="hud-card">
+          <small>Tempo</small>
+          <span id="tempo">0s</span>
+        </div>
+      </div>
     </div>
 
     <div class="barra-wrap">
-        <div class="barra-fundo">
-            <div class="barra" id="barraProgresso"></div>
-        </div>
+      <div class="barra-fundo">
+        <div class="barra" id="barraProgresso"></div>
+      </div>
     </div>
 
     <div id="tabuleiro"></div>
-</section>
+  </section>
 
-<!-- FIM -->
-<section id="fim" class="tela">
+  <!-- FIM -->
+  <section id="fim" class="tela">
     <div class="painel fim-box">
-        <h1 id="tituloFim">Fim de jogo</h1>
-        <p id="subtituloFim">Confira seu resultado final.</p>
+      <h1 id="tituloFim">Fim de jogo</h1>
+      <p id="subtituloFim">Confira seu resultado final.</p>
 
-        <div class="resultado-grid">
-            <div class="resultado-item">
-                <strong>Jogador</strong>
-                <span id="resNome">-</span>
-            </div>
-            <div class="resultado-item">
-                <strong>Nível</strong>
-                <span id="resNivel">-</span>
-            </div>
-            <div class="resultado-item">
-                <strong>Pontuação</strong>
-                <span id="resPontos">0</span>
-            </div>
-            <div class="resultado-item">
-                <strong>Tempo usado</strong>
-                <span id="resTempo">0s</span>
-            </div>
+      <div class="resultado-grid">
+        <div class="resultado-item">
+          <strong>Jogador</strong>
+          <span id="resNome">-</span>
         </div>
 
-        <div class="botoes-fim">
-            <button class="btn-principal" onclick="jogarNovamente()">Jogar novamente</button>
-            <button class="btn-secundario" onclick="voltarInicio()">Voltar ao início</button>
+        <div class="resultado-item">
+          <strong>Nível</strong>
+          <span id="resNivel">-</span>
         </div>
+
+        <div class="resultado-item">
+          <strong>Pontuação</strong>
+          <span id="resPontos">0</span>
+        </div>
+
+        <div class="resultado-item">
+          <strong>Tempo usado</strong>
+          <span id="resTempo">0s</span>
+        </div>
+      </div>
+
+      <div class="botoes-fim">
+        <button class="btn-principal" onclick="jogarNovamente()">Jogar novamente</button>
+        <button class="btn-secundario" onclick="voltarInicio()">Voltar ao início</button>
+      </div>
     </div>
 
     <div class="painel ranking-fim">
-        <h2 style="margin-bottom:16px;">🏆 Ranking atualizado</h2>
-        <div class="ranking-scroll">
-            <table id="rankingFim"></table>
-        </div>
+      <h2 style="margin-bottom:16px;">🏆 Ranking atualizado</h2>
+      <div class="ranking-scroll">
+        <table id="rankingFim"></table>
+      </div>
     </div>
-</section>
+  </section>
 
-<script>
-/* =========================
-   CONFIGURAÇÕES
-========================= */
-const cartasDisponiveis = [
-    { id: "1", imagem: "img/1.jpeg" },
-    { id: "2", imagem: "img/2.jpeg" },
-    { id: "3", imagem: "img/3.jpeg" },
-    { id: "4", imagem: "img/4.jpeg" },
-    { id: "5", imagem: "img/5.jpeg" },
-    { id: "6", imagem: "img/6.jpeg" },
-    { id: "7", imagem: "img/7.jpeg" },
-    { id: "8", imagem: "img/8.jpeg" },
-    { id: "9", imagem: "img/9.jpeg" },
-    { id: "10", imagem: "img/10.png" }
-];
+  <script>
+    const cartasDisponiveis = [
+      { id: "1", imagem: "img/1.jpeg" },
+      { id: "2", imagem: "img/2.jpeg" },
+      { id: "3", imagem: "img/3.jpeg" },
+      { id: "4", imagem: "img/4.jpeg" },
+      { id: "5", imagem: "img/5.jpeg" },
+      { id: "6", imagem: "img/6.jpeg" },
+      { id: "7", imagem: "img/7.jpeg" },
+      { id: "8", imagem: "img/8.jpeg" },
+      { id: "9", imagem: "img/9.jpeg" },
+      { id: "10", imagem: "img/10.png" }
+    ];
 
-// imagem única do verso de todas as cartas
-const imagemVerso = "img/verso-carta.jpeg";
+    const imagemVerso = "img/verso-carta.png";
 
-const niveis = {
-    1: { nome: "Fácil", pares: 3, tempo: 90 },
-    2: { nome: "Médio", pares: 7, tempo: 60 },
-    3: { nome: "Difícil", pares: 10, tempo: 40 }
-};
+    const niveis = {
+      1: { nome: "Fácil", pares: 3, tempo: 90 },
+      2: { nome: "Médio", pares: 7, tempo: 60 },
+      3: { nome: "Difícil", pares: 10, tempo: 40 }
+    };
 
-/* =========================
-   ESTADO DO JOGO
-========================= */
-let cartas = [];
-let primeira = null;
-let segunda = null;
-let bloqueio = false;
-let pontos = 0;
-let paresEncontrados = 0;
-let totalPares = 0;
-let tempoRestante = 0;
-let tempoInicial = 0;
-let intervalo = null;
-let nomeAtual = "";
-let nivelAtual = "";
-let jogoAtivo = false;
+    let cartas = [];
+    let primeira = null;
+    let segunda = null;
+    let bloqueio = false;
+    let pontos = 0;
+    let paresEncontrados = 0;
+    let totalPares = 0;
+    let tempoRestante = 0;
+    let tempoInicial = 0;
+    let intervalo = null;
+    let nomeAtual = "";
+    let nivelAtual = "";
+    let jogoAtivo = false;
 
-/* =========================
-   TELAS
-========================= */
-function mostrarTela(id){
-    document.querySelectorAll(".tela").forEach(t => t.classList.remove("ativa"));
-    document.getElementById(id).classList.add("ativa");
-}
+    function mostrarTela(id){
+      document.querySelectorAll(".tela").forEach(t => t.classList.remove("ativa"));
+      document.getElementById(id).classList.add("ativa");
+    }
 
-/* =========================
-   INICIAR JOGO
-========================= */
-function iniciar(nivelEscolhido){
-    const inputNome = document.getElementById("nomeJogador");
-    nomeAtual = inputNome.value.trim();
+    function iniciar(nivelEscolhido){
+      const inputNome = document.getElementById("nomeJogador");
+      nomeAtual = inputNome.value.trim();
 
-    if(!nomeAtual){
+      if(!nomeAtual){
         alert("Digite seu nome para jogar.");
         inputNome.focus();
         return;
+      }
+
+      clearInterval(intervalo);
+
+      const config = niveis[nivelEscolhido];
+      nivelAtual = config.nome;
+      totalPares = config.pares;
+      tempoRestante = config.tempo;
+      tempoInicial = config.tempo;
+
+      pontos = 0;
+      paresEncontrados = 0;
+      primeira = null;
+      segunda = null;
+      bloqueio = false;
+      jogoAtivo = true;
+
+      document.getElementById("hudNome").innerText = nomeAtual;
+      document.getElementById("hudNivel").innerText = nivelAtual;
+      document.getElementById("info").innerText = pontos;
+
+      atualizarTempo();
+      atualizarBarra();
+      criarTabuleiro(totalPares);
+
+      mostrarTela("jogo");
+      iniciarTempo();
     }
 
-    clearInterval(intervalo);
+    function iniciarTempo(){
+      atualizarTempo();
 
-    const config = niveis[nivelEscolhido];
-    nivelAtual = config.nome;
-    totalPares = config.pares;
-    tempoRestante = config.tempo;
-    tempoInicial = config.tempo;
-
-    pontos = 0;
-    paresEncontrados = 0;
-    primeira = null;
-    segunda = null;
-    bloqueio = false;
-    jogoAtivo = true;
-
-    document.getElementById("tituloJogador").innerText = `Boa sorte, ${nomeAtual}!`;
-    document.getElementById("hudNome").innerText = nomeAtual;
-    document.getElementById("hudNivel").innerText = nivelAtual;
-    document.getElementById("info").innerText = pontos;
-
-    atualizarTempo();
-    atualizarBarra();
-    criarTabuleiro(totalPares);
-
-    mostrarTela("jogo");
-    iniciarTempo();
-}
-
-/* =========================
-   TIMER
-========================= */
-function iniciarTempo(){
-    atualizarTempo();
-
-    intervalo = setInterval(() => {
+      intervalo = setInterval(() => {
         tempoRestante--;
         atualizarTempo();
 
         if(tempoRestante <= 0){
-            fimDeJogo(false);
+          fimDeJogo(false);
         }
-    }, 1000);
-}
-
-function atualizarTempo(){
-    const tempoEl = document.getElementById("tempo");
-    tempoEl.innerText = tempoRestante + "s";
-
-    if(tempoRestante <= 10){
-        tempoEl.classList.add("critico");
-    } else {
-        tempoEl.classList.remove("critico");
+      }, 1000);
     }
-}
 
-/* =========================
-   PROGRESSO
-========================= */
-function atualizarBarra(){
-    const porcentagem = totalPares > 0 ? (paresEncontrados / totalPares) * 100 : 0;
-    document.getElementById("barraProgresso").style.width = porcentagem + "%";
-}
+    function atualizarTempo(){
+      const tempoEl = document.getElementById("tempo");
+      tempoEl.innerText = tempoRestante + "s";
 
-/* =========================
-   TABULEIRO
-========================= */
-function embaralhar(array){
-    return array.sort(() => Math.random() - 0.5);
-}
+      if(tempoRestante <= 10){
+        tempoEl.classList.add("critico");
+      } else {
+        tempoEl.classList.remove("critico");
+      }
+    }
 
-function criarTabuleiro(pares){
-    const tabuleiro = document.getElementById("tabuleiro");
-    tabuleiro.innerHTML = "";
+    function atualizarBarra(){
+      const porcentagem = totalPares > 0 ? (paresEncontrados / totalPares) * 100 : 0;
+      document.getElementById("barraProgresso").style.width = porcentagem + "%";
+    }
 
-    const selecionadas = embaralhar([...cartasDisponiveis]).slice(0, pares);
-    cartas = embaralhar([...selecionadas, ...selecionadas]);
+    function embaralhar(array){
+      return array.sort(() => Math.random() - 0.5);
+    }
 
-    let colunas = 3;
-    if(cartas.length > 6 && cartas.length <= 14) colunas = 4;
-    if(cartas.length > 14) colunas = 5;
+    function criarTabuleiro(pares){
+      const tabuleiro = document.getElementById("tabuleiro");
+      tabuleiro.innerHTML = "";
 
-    tabuleiro.style.gridTemplateColumns = `repeat(${colunas}, minmax(78px, 110px))`;
+      const selecionadas = embaralhar([...cartasDisponiveis]).slice(0, pares);
+      cartas = embaralhar([...selecionadas, ...selecionadas]);
 
-    cartas.forEach((cartaAtual, indice) => {
+      let colunas = 3;
+      if(cartas.length > 6 && cartas.length <= 14) colunas = 4;
+      if(cartas.length > 14) colunas = 5;
+
+      tabuleiro.style.gridTemplateColumns = `repeat(${colunas}, minmax(78px, 110px))`;
+
+      cartas.forEach((cartaAtual, indice) => {
         const carta = document.createElement("div");
         carta.className = "carta";
         carta.dataset.valor = cartaAtual.id;
         carta.dataset.indice = indice;
 
         carta.innerHTML = `
-            <div class="carta-inner">
-                <div class="face verso">
-                    <img src="${imagemVerso}" alt="Verso da carta">
-                </div>
-                <div class="face frente">
-                    <img src="${cartaAtual.imagem}" alt="Carta ${cartaAtual.id}">
-                </div>
+          <div class="carta-inner">
+            <div class="face verso">
+              <img src="${imagemVerso}" alt="Verso da carta">
             </div>
+            <div class="face frente">
+              <img src="${cartaAtual.imagem}" alt="Carta ${cartaAtual.id}">
+            </div>
+          </div>
         `;
 
         carta.addEventListener("click", () => virarCarta(carta));
         tabuleiro.appendChild(carta);
-    });
-}
+      });
+    }
 
-/* =========================
-   VIRAR CARTAS
-========================= */
-function virarCarta(carta){
-    if(!jogoAtivo) return;
-    if(bloqueio) return;
-    if(carta.classList.contains("virada")) return;
-    if(carta.classList.contains("encontrada")) return;
+    function virarCarta(carta){
+      if(!jogoAtivo) return;
+      if(bloqueio) return;
+      if(carta.classList.contains("virada")) return;
+      if(carta.classList.contains("encontrada")) return;
 
-    carta.classList.add("virada");
+      carta.classList.add("virada");
 
-    if(!primeira){
+      if(!primeira){
         primeira = carta;
         return;
-    }
+      }
 
-    segunda = carta;
-    bloqueio = true;
+      segunda = carta;
+      bloqueio = true;
 
-    const carta1 = primeira;
-    const carta2 = segunda;
+      const carta1 = primeira;
+      const carta2 = segunda;
 
-    if(carta1.dataset.valor === carta2.dataset.valor){
+      if(carta1.dataset.valor === carta2.dataset.valor){
         setTimeout(() => {
-            carta1.classList.add("encontrada");
-            carta2.classList.add("encontrada");
+          carta1.classList.add("encontrada");
+          carta2.classList.add("encontrada");
 
-            pontos += 10;
-            paresEncontrados++;
+          pontos += 10;
+          paresEncontrados++;
 
-            document.getElementById("info").innerText = pontos;
-            atualizarBarra();
-            resetarSelecao();
+          document.getElementById("info").innerText = pontos;
+          atualizarBarra();
+          resetarSelecao();
 
-            if(paresEncontrados === totalPares){
-                fimDeJogo(true);
-            }
+          if(paresEncontrados === totalPares){
+            fimDeJogo(true);
+          }
         }, 450);
-    } else {
+      } else {
         setTimeout(() => {
-            carta1.classList.remove("virada");
-            carta2.classList.remove("virada");
-            resetarSelecao();
+          carta1.classList.remove("virada");
+          carta2.classList.remove("virada");
+          resetarSelecao();
         }, 900);
+      }
     }
-}
 
-function resetarSelecao(){
-    primeira = null;
-    segunda = null;
-    bloqueio = false;
-}
+    function resetarSelecao(){
+      primeira = null;
+      segunda = null;
+      bloqueio = false;
+    }
 
-/* =========================
-   FIM DE JOGO
-========================= */
-function fimDeJogo(venceu){
-    if(!jogoAtivo) return;
+    function fimDeJogo(venceu){
+      if(!jogoAtivo) return;
 
-    jogoAtivo = false;
-    clearInterval(intervalo);
+      jogoAtivo = false;
+      clearInterval(intervalo);
 
-    const tempoGasto = tempoInicial - tempoRestante;
+      const tempoGasto = tempoInicial - tempoRestante;
 
-    salvarRanking(nomeAtual, nivelAtual, pontos, tempoGasto);
+      salvarRanking(nomeAtual, nivelAtual, pontos, tempoGasto);
 
-    document.getElementById("tituloFim").innerText = venceu ? "🎉 Você venceu!" : "⏰ Tempo esgotado!";
-    document.getElementById("subtituloFim").innerText = venceu
+      document.getElementById("tituloFim").innerText = venceu ? "🎉 Você venceu!" : "⏰ Tempo esgotado!";
+      document.getElementById("subtituloFim").innerText = venceu
         ? "Parabéns, você encontrou todos os pares."
         : "Seu tempo acabou, mas sua pontuação foi salva no ranking.";
 
-    document.getElementById("resNome").innerText = nomeAtual;
-    document.getElementById("resNivel").innerText = nivelAtual;
-    document.getElementById("resPontos").innerText = pontos;
-    document.getElementById("resTempo").innerText = tempoGasto + "s";
+      document.getElementById("resNome").innerText = nomeAtual;
+      document.getElementById("resNivel").innerText = nivelAtual;
+      document.getElementById("resPontos").innerText = pontos;
+      document.getElementById("resTempo").innerText = tempoGasto + "s";
 
-    mostrarTela("fim");
-}
+      mostrarTela("fim");
+    }
 
-/* =========================
-   RANKING
-========================= */
-function salvarRanking(nome, nivel, pontos, tempo){
-    let ranking = JSON.parse(localStorage.getItem("rankingMemoria")) || [];
+    function salvarRanking(nome, nivel, pontos, tempo){
+      let ranking = JSON.parse(localStorage.getItem("rankingMemoria")) || [];
 
-    const indiceExistente = ranking.findIndex(item =>
+      const indiceExistente = ranking.findIndex(item =>
         item.nome.toLowerCase() === nome.toLowerCase() && item.nivel === nivel
-    );
+      );
 
-    const novoRegistro = {
+      const novoRegistro = {
         nome,
         nivel,
         pontos,
         tempo,
         data: new Date().toLocaleDateString("pt-BR")
-    };
+      };
 
-    if(indiceExistente === -1){
+      if(indiceExistente === -1){
         ranking.push(novoRegistro);
-    } else {
+      } else {
         const antigo = ranking[indiceExistente];
 
         const novoEhMelhor =
-            pontos > antigo.pontos ||
-            (pontos === antigo.pontos && tempo < antigo.tempo);
+          pontos > antigo.pontos ||
+          (pontos === antigo.pontos && tempo < antigo.tempo);
 
         if(novoEhMelhor){
-            ranking[indiceExistente] = novoRegistro;
+          ranking[indiceExistente] = novoRegistro;
         }
-    }
+      }
 
-    ranking.sort((a, b) => {
+      ranking.sort((a, b) => {
         if(b.pontos !== a.pontos) return b.pontos - a.pontos;
         return a.tempo - b.tempo;
-    });
+      });
 
-    localStorage.setItem("rankingMemoria", JSON.stringify(ranking));
-    carregarRanking();
-}
-
-function montarTabelaRanking(){
-    let ranking = JSON.parse(localStorage.getItem("rankingMemoria")) || [];
-
-    if(ranking.length === 0){
-        return `
-            <tr>
-                <td class="sem-ranking" colspan="5">Nenhuma partida registrada ainda.</td>
-            </tr>
-        `;
+      localStorage.setItem("rankingMemoria", JSON.stringify(ranking));
+      carregarRanking();
     }
 
-    let html = `
-        <tr>
-            <th>Jogador</th>
-            <th>Nível</th>
-            <th>Pontos</th>
-            <th>Tempo</th>
-            <th>Data</th>
-        </tr>
-    `;
+    function montarTabelaRanking(){
+      let ranking = JSON.parse(localStorage.getItem("rankingMemoria")) || [];
 
-    ranking.slice(0, 10).forEach(item => {
-        html += `
-            <tr>
-                <td>${item.nome}</td>
-                <td>${item.nivel}</td>
-                <td><strong>${item.pontos}</strong></td>
-                <td>${item.tempo}s</td>
-                <td>${item.data}</td>
-            </tr>
+      if(ranking.length === 0){
+        return `
+          <tr>
+            <td class="sem-ranking" colspan="5">Nenhuma partida registrada ainda.</td>
+          </tr>
         `;
-    });
+      }
 
-    return html;
-}
+      let html = `
+        <tr>
+          <th>Jogador</th>
+          <th>Nível</th>
+          <th>Pontos</th>
+          <th>Tempo</th>
+          <th>Data</th>
+        </tr>
+      `;
 
-function carregarRanking(){
-    const html = montarTabelaRanking();
-    document.getElementById("rankingInicio").innerHTML = html;
-    document.getElementById("rankingFim").innerHTML = html;
-}
+      ranking.slice(0, 10).forEach(item => {
+        html += `
+          <tr>
+            <td>${item.nome}</td>
+            <td>${item.nivel}</td>
+            <td><strong>${item.pontos}</strong></td>
+            <td>${item.tempo}s</td>
+            <td>${item.data}</td>
+          </tr>
+        `;
+      });
 
-/* =========================
-   AÇÕES DOS BOTÕES
-========================= */
-function jogarNovamente(){
-    mostrarTela("inicio");
-}
+      return html;
+    }
 
-function voltarInicio(){
-    clearInterval(intervalo);
-    jogoAtivo = false;
-    resetarSelecao();
-    mostrarTela("inicio");
-}
+    function carregarRanking(){
+      const html = montarTabelaRanking();
+      document.getElementById("rankingInicio").innerHTML = html;
+      document.getElementById("rankingFim").innerHTML = html;
+    }
 
-/* =========================
-   INICIALIZAÇÃO
-========================= */
-carregarRanking();
-</script>
+    function jogarNovamente(){
+      mostrarTela("inicio");
+    }
 
+    function voltarInicio(){
+      clearInterval(intervalo);
+      jogoAtivo = false;
+      resetarSelecao();
+      mostrarTela("inicio");
+    }
+
+    carregarRanking();
+  </script>
 </body>
 </html>
